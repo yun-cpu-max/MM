@@ -10,14 +10,15 @@ import LoginScreen from './screens/LoginScreen';
 import MeetingListScreen from './screens/MeetingListScreen';
 import CreateMeetingScreen from './screens/CreateMeetingScreen';
 import { useMeetingData } from './hooks/useMeetingData';
-import type { Screen, AppState, NewMeetingData } from './types';
+import type { Screen, AppState, NewMeetingData, Member } from './types';
 
 const App: React.FC = () => {
   const [appState, setAppState] = useState<AppState>('login');
   const [activeScreen, setActiveScreen] = useState<Screen>('home');
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<Member | null>(null);
 
-  const meetingData = useMeetingData();
+  const meetingData = useMeetingData(selectedMeetingId, currentUser);
   
   const screenTitles: Record<Screen, string> = {
     home: '대시보드',
@@ -29,6 +30,7 @@ const App: React.FC = () => {
 
   const handleLogout = () => {
     setSelectedMeetingId(null);
+    setCurrentUser(null);
     setAppState('login');
     setActiveScreen('home');
   };
@@ -39,7 +41,10 @@ const App: React.FC = () => {
   }
 
   if (appState === 'login') {
-    return <LoginScreen onLoginSuccess={() => setAppState('meetingList')} />;
+    return <LoginScreen onLoginSuccess={(user) => {
+        setCurrentUser(user);
+        setAppState('meetingList');
+    }} />;
   }
 
   if (appState === 'meetingList') {

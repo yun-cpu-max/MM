@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import Card from '../components/Card';
+import type { Member } from '../types';
+import { MOCK_MEMBERS } from '../data/mockData';
 
 interface LoginScreenProps {
-  onLoginSuccess: () => void;
+  onLoginSuccess: (user: Member) => void;
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
@@ -14,7 +16,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
     e.preventDefault();
     if (id === 'test' && password === '1111') {
       setError('');
-      onLoginSuccess();
+      // 'test' user is the leader (MOCK_MEMBERS[0])
+      onLoginSuccess(MOCK_MEMBERS[0]);
+    } else if (id === 'test2' && password === '1111') {
+      setError('');
+      // 'test2' user is a regular member (MOCK_MEMBERS[1])
+      onLoginSuccess(MOCK_MEMBERS[1]);
     } else {
       setError('아이디 또는 비밀번호가 올바르지 않습니다.');
     }
@@ -36,7 +43,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
                 id="id"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
-                placeholder="test"
+                placeholder="test (리더), test2 (멤버)"
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                 required
               />
