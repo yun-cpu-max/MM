@@ -1,4 +1,4 @@
-export type AppState = 'login' | 'meetingList' | 'inMeeting' | 'createMeeting';
+export type AppState = 'login' | 'meetingList' | 'inMeeting' | 'createMeeting' | 'manageMembers' | 'editRules' | 'editProfile';
 
 export type Screen = 'home' | 'attendance' | 'finance' | 'notice' | 'members';
 
@@ -78,6 +78,7 @@ export interface MeetingData {
     meeting: Meeting;
     currentUser: Member;
     members: Member[];
+    pendingMembers: Member[];
     sessions: MeetingSession[];
     expenses: Expense[];
     announcements: Announcement[];
@@ -90,4 +91,9 @@ export interface MeetingDataHook extends MeetingData {
     addExpense: (expense: Omit<Expense, 'id'>) => void;
     addVote: (option: string) => void;
     addMeeting: (meeting: NewMeetingData) => void;
+    updateMeetingRules: (newRules: MeetingRules) => void;
+    updateMember: (memberId: string, updatedData: Partial<Pick<Member, 'name'>>) => void;
+    removeMember: (memberId: string) => void;
+    approveMember: (memberId: string) => void;
+    rejectMember: (memberId: string) => void;
 }

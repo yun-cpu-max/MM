@@ -10,6 +10,10 @@ export const MOCK_MEMBERS: Member[] = [
   { id: '5', name: '정하은', isLeader: false, avatarUrl: 'https://picsum.photos/seed/5/200' },
 ];
 
+export const MOCK_PENDING_MEMBERS: Member[] = [
+  { id: 'p1', name: '박신청', isLeader: false, avatarUrl: 'https://picsum.photos/seed/p1/200' },
+];
+
 export const MOCK_MEETINGS_LIST: MeetingInfo[] = [
     { id: '1', name: '사이드 프로젝트 "모임 총무"', description: '모임 관리를 위한 웹 앱 개발 스터디' },
     { id: '2', name: '대학생 독서 토론', description: '매주 1권의 책을 읽고 토론하는 모임' },

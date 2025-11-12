@@ -6,6 +6,9 @@ interface SettingsModalProps {
     onClose: () => void;
     isLeader: boolean;
     onLeaveMeeting: () => void;
+    onManageMembers: () => void;
+    onEditRules: () => void;
+    onEditProfile: () => void;
 }
 
 const MenuItem: React.FC<{ onClick: () => void; children: React.ReactNode }> = ({ onClick, children }) => (
@@ -18,14 +21,8 @@ const MenuItem: React.FC<{ onClick: () => void; children: React.ReactNode }> = (
 );
 
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, isLeader, onLeaveMeeting }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, isLeader, onLeaveMeeting, onManageMembers, onEditRules, onEditProfile }) => {
     if (!isOpen) return null;
-
-    // Placeholder functions for actions not yet implemented
-    const handleManageMembers = () => alert('멤버 관리 기능이 구현될 예정입니다.');
-    const handleEditRules = () => alert('규칙 수정 기능이 구현될 예정입니다.');
-    const handleEditProfile = () => alert('내 정보 수정 기능이 구현될 예정입니다.');
-
 
     return (
         <div 
@@ -47,17 +44,17 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, isLeader
                     <div className="space-y-1">
                         {isLeader ? (
                             <>
-                                <MenuItem onClick={handleManageMembers}>
+                                <MenuItem onClick={onManageMembers}>
                                     <span>👥</span>
                                     <span>멤버 관리</span>
                                 </MenuItem>
-                                <MenuItem onClick={handleEditRules}>
+                                <MenuItem onClick={onEditRules}>
                                     <span>⚙️</span>
                                     <span>규칙 수정</span>
                                 </MenuItem>
                             </>
                         ) : (
-                            <MenuItem onClick={handleEditProfile}>
+                            <MenuItem onClick={onEditProfile}>
                                 <span>👤</span>
                                 <span>내 정보 수정</span>
                             </MenuItem>
