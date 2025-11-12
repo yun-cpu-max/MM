@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import BottomNav from './components/BottomNav';
 import Header from './components/Header';
@@ -7,11 +6,17 @@ import AttendanceScreen from './screens/AttendanceScreen';
 import FinanceScreen from './screens/FinanceScreen';
 import NoticeScreen from './screens/NoticeScreen';
 import MembersScreen from './screens/MembersScreen';
+import LoginScreen from './screens/LoginScreen';
+import MeetingListScreen from './screens/MeetingListScreen';
+import CreateMeetingScreen from './screens/CreateMeetingScreen';
 import { useMeetingData } from './hooks/useMeetingData';
-import type { Screen } from './types';
+import type { Screen, AppState, NewMeetingData } from './types';
 
 const App: React.FC = () => {
+  const [appState, setAppState] = useState<AppState>('login');
   const [activeScreen, setActiveScreen] = useState<Screen>('home');
+  const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
+
   const meetingData = useMeetingData();
   
   const screenTitles: Record<Screen, string> = {
@@ -22,6 +27,39 @@ const App: React.FC = () => {
     members: '멤버 랭킹',
   };
 
+  const handleLogout = () => {
+    setSelectedMeetingId(null);
+    setAppState('login');
+    setActiveScreen('home');
+  };
+  
+  const handleCreateMeeting = (newMeeting: NewMeetingData) => {
+    meetingData.addMeeting(newMeeting);
+    setAppState('meetingList');
+  }
+
+  if (appState === 'login') {
+    return <LoginScreen onLoginSuccess={() => setAppState('meetingList')} />;
+  }
+
+  if (appState === 'meetingList') {
+    return <MeetingListScreen 
+      meetings={meetingData.meetings}
+      onSelectMeeting={(id) => {
+        setSelectedMeetingId(id);
+        setAppState('inMeeting');
+      }} 
+      onCreateMeeting={() => setAppState('createMeeting')}
+      />;
+  }
+
+  if (appState === 'createMeeting') {
+    return <CreateMeetingScreen 
+      onMeetingCreate={handleCreateMeeting}
+      onCancel={() => setAppState('meetingList')}
+    />;
+  }
+  
   const renderScreen = () => {
     switch (activeScreen) {
       case 'home':
@@ -42,7 +80,11 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen font-sans antialiased text-onSurface bg-background md:max-w-md md:mx-auto md:shadow-lg md:border md:border-gray-200">
       <div className="flex flex-col h-screen">
-        <Header title={screenTitles[activeScreen]} groupName={meetingData.meeting.name} />
+        <Header 
+          title={screenTitles[activeScreen]} 
+          groupName={meetingData.meeting.name}
+          onLogout={handleLogout}
+        />
         <main className="flex-grow overflow-y-auto pb-20 bg-background">
           {renderScreen()}
         </main>

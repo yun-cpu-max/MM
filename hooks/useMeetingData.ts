@@ -1,6 +1,5 @@
-
 import { useState, useCallback } from 'react';
-import type { MeetingDataHook, Member, MeetingSession, Expense, FineVote, Announcement, Meeting, MeetingRules } from '../types';
+import type { MeetingDataHook, Member, MeetingSession, Expense, FineVote, Announcement, Meeting, MeetingRules, MeetingInfo, NewMeetingData } from '../types';
 import { AttendanceStatus } from '../types';
 
 const MOCK_MEMBERS: Member[] = [
@@ -9,6 +8,11 @@ const MOCK_MEMBERS: Member[] = [
   { id: '3', name: '박도윤', isLeader: false, avatarUrl: 'https://picsum.photos/seed/3/200' },
   { id: '4', name: '최지우', isLeader: false, avatarUrl: 'https://picsum.photos/seed/4/200' },
   { id: '5', name: '정하은', isLeader: false, avatarUrl: 'https://picsum.photos/seed/5/200' },
+];
+
+const MOCK_MEETINGS_LIST: MeetingInfo[] = [
+    { id: '1', name: '사이드 프로젝트 "모임 총무"', description: '모임 관리를 위한 웹 앱 개발 스터디' },
+    { id: '2', name: '대학생 독서 토론', description: '매주 1권의 책을 읽고 토론하는 모임' },
 ];
 
 const MOCK_SESSIONS: MeetingSession[] = [
@@ -79,6 +83,7 @@ export const useMeetingData = (): MeetingDataHook => {
   const [sessions, setSessions] = useState<MeetingSession[]>(MOCK_SESSIONS);
   const [expenses, setExpenses] = useState<Expense[]>(MOCK_EXPENSES);
   const [fineVote, setFineVote] = useState<FineVote>(MOCK_FINE_VOTE);
+  const [meetings, setMeetings] = useState<MeetingInfo[]>(MOCK_MEETINGS_LIST);
 
   const updateAttendance = useCallback((sessionId: string, memberId: string, status: AttendanceStatus) => {
     setSessions(prevSessions =>
@@ -106,6 +111,15 @@ export const useMeetingData = (): MeetingDataHook => {
       }));
   }, []);
 
+  const addMeeting = useCallback((meeting: NewMeetingData) => {
+    const newMeetingInfo: MeetingInfo = {
+      id: `${Date.now()}`,
+      name: meeting.name,
+      description: meeting.description
+    };
+    setMeetings(prev => [...prev, newMeetingInfo]);
+  }, []);
+
   const totalFines = sessions.reduce((total, session) => {
       return total + session.attendance.reduce((sessionTotal, att) => {
           if (att.status === AttendanceStatus.Late) return sessionTotal + MOCK_RULES.lateFine;
@@ -122,8 +136,10 @@ export const useMeetingData = (): MeetingDataHook => {
     expenses,
     announcements: MOCK_ANNOUNCEMENTS,
     fineVote: {...fineVote, totalFines },
+    meetings,
     updateAttendance,
     addExpense,
     addVote,
+    addMeeting,
   };
 };

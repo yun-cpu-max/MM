@@ -1,3 +1,4 @@
+export type AppState = 'login' | 'meetingList' | 'inMeeting' | 'createMeeting';
 
 export type Screen = 'home' | 'attendance' | 'finance' | 'notice' | 'members';
 
@@ -61,6 +62,18 @@ export interface Meeting {
   rules: MeetingRules;
 }
 
+export interface MeetingInfo {
+    id: string;
+    name: string;
+    description: string;
+}
+
+export interface NewMeetingData {
+    name: string;
+    description: string;
+    rules: MeetingRules;
+}
+
 export interface MeetingData {
     meeting: Meeting;
     currentUser: Member;
@@ -69,10 +82,12 @@ export interface MeetingData {
     expenses: Expense[];
     announcements: Announcement[];
     fineVote: FineVote;
+    meetings: MeetingInfo[];
 }
 
 export interface MeetingDataHook extends MeetingData {
     updateAttendance: (sessionId: string, memberId: string, status: AttendanceStatus) => void;
     addExpense: (expense: Omit<Expense, 'id'>) => void;
     addVote: (option: string) => void;
+    addMeeting: (meeting: NewMeetingData) => void;
 }
