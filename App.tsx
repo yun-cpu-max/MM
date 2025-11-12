@@ -9,6 +9,7 @@ import MembersScreen from './screens/MembersScreen';
 import LoginScreen from './screens/LoginScreen';
 import MeetingListScreen from './screens/MeetingListScreen';
 import CreateMeetingScreen from './screens/CreateMeetingScreen';
+import SettingsModal from './components/SettingsModal';
 import { useMeetingData } from './hooks/useMeetingData';
 import type { Screen, AppState, NewMeetingData, Member } from './types';
 
@@ -17,6 +18,7 @@ const App: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState<Screen>('home');
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
   const [currentUser, setCurrentUser] = useState<Member | null>(null);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const meetingData = useMeetingData(selectedMeetingId, currentUser);
   
@@ -29,6 +31,7 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
+    setIsSettingsModalOpen(false);
     setSelectedMeetingId(null);
     setCurrentUser(null);
     setAppState('login');
@@ -37,6 +40,12 @@ const App: React.FC = () => {
   
   const handleCreateMeeting = (newMeeting: NewMeetingData) => {
     meetingData.addMeeting(newMeeting);
+    setAppState('meetingList');
+  }
+
+  const handleLeaveMeeting = () => {
+    setIsSettingsModalOpen(false);
+    setSelectedMeetingId(null);
     setAppState('meetingList');
   }
 
@@ -89,12 +98,21 @@ const App: React.FC = () => {
           title={screenTitles[activeScreen]} 
           groupName={meetingData.meeting.name}
           onLogout={handleLogout}
+          onSettingsClick={() => setIsSettingsModalOpen(true)}
         />
         <main className="flex-grow overflow-y-auto pb-20 bg-background">
           {renderScreen()}
         </main>
         <BottomNav activeScreen={activeScreen} setActiveScreen={setActiveScreen} />
       </div>
+      {isSettingsModalOpen && (
+        <SettingsModal
+          isOpen={isSettingsModalOpen}
+          onClose={() => setIsSettingsModalOpen(false)}
+          isLeader={meetingData.currentUser.isLeader}
+          onLeaveMeeting={handleLeaveMeeting}
+        />
+      )}
     </div>
   );
 };
