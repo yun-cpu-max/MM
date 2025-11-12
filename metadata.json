@@ -1,0 +1,5 @@
+{
+  "name": "모임 총무 (Meeting Treasurer)",
+  "description": "An integrated management web app for small groups, handling everything from attendance and fine settlement to shared expense management, communication, and member motivation through a dashboard.",
+  "requestFramePermissions": []
+}
