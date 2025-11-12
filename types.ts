@@ -14,6 +14,7 @@ export interface Member {
   name: string;
   isLeader: boolean;
   avatarUrl: string;
+  balance: number;
 }
 
 export interface MeetingSession {
@@ -74,13 +75,25 @@ export interface NewMeetingData {
     rules: MeetingRules;
 }
 
+export interface SettlementPeriod {
+    id: string;
+    name: string;
+    startDate: string;
+    endDate: string | null;
+    sessions: MeetingSession[];
+    expenses: Expense[];
+    isSettled: boolean;
+}
+
 export interface MeetingData {
     meeting: Meeting;
     currentUser: Member;
     members: Member[];
     pendingMembers: Member[];
-    sessions: MeetingSession[];
-    expenses: Expense[];
+    periods: SettlementPeriod[];
+    sessions: MeetingSession[]; // Active period sessions
+    allSessions: MeetingSession[]; // All sessions from all periods
+    expenses: Expense[]; // Active period expenses
     announcements: Announcement[];
     fineVote: FineVote;
     meetings: MeetingInfo[];
@@ -96,4 +109,6 @@ export interface MeetingDataHook extends MeetingData {
     removeMember: (memberId: string) => void;
     approveMember: (memberId: string) => void;
     rejectMember: (memberId: string) => void;
+    addAnnouncement: (title: string, content: string) => void;
+    settleCurrentPeriod: () => void;
 }

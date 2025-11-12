@@ -10,7 +10,7 @@ interface HomeScreenProps {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ data }) => {
-  const { currentUser, sessions, announcements, meeting, fineVote } = data;
+  const { currentUser, sessions, allSessions, announcements, meeting, fineVote } = data;
 
   const myStats = useMemo(() => {
     let present = 0;
@@ -18,7 +18,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ data }) => {
     let absent = 0;
     let totalFines = 0;
 
-    sessions.forEach(session => {
+    allSessions.forEach(session => {
       const myAttendance = session.attendance.find(att => att.memberId === currentUser.id);
       if (myAttendance) {
         if (myAttendance.status === AttendanceStatus.Present) present++;
@@ -33,11 +33,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ data }) => {
       }
     });
     
-    const totalMeetings = sessions.filter(s => s.attendance.some(a => a.status !== AttendanceStatus.Pending)).length;
-    const attendanceRate = totalMeetings > 0 ? Math.round((present / totalMeetings) * 100) : 100;
+    const totalMeetings = allSessions.filter(s => s.attendance.some(a => a.memberId === currentUser.id && a.status !== AttendanceStatus.Pending)).length;
+    const attendanceRate = totalMeetings > 0 ? Math.round(((present + late) / totalMeetings) * 100) : 100;
 
     return { present, late, absent, totalFines, attendanceRate };
-  }, [sessions, currentUser.id, meeting.rules]);
+  }, [allSessions, currentUser.id, meeting.rules]);
 
   const attendanceData = [
     { name: '출석', value: myStats.present },

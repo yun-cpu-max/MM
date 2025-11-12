@@ -32,7 +32,7 @@ const NoticeScreen: React.FC<NoticeScreenProps> = ({ data }) => {
       }>
         <div className="space-y-4">
           {announcements.map(ann => (
-            <details key={ann.id} className="p-4 bg-gray-50 rounded-lg group">
+            <details key={ann.id} className="p-4 bg-gray-50 rounded-lg group" open={ann.title.includes('리포트')}>
               <summary className="font-semibold cursor-pointer list-none flex justify-between items-center">
                 <span>{ann.title}</span>
                 <span className="text-sm text-onSurfaceSecondary transition-transform transform group-open:rotate-180">▼</span>

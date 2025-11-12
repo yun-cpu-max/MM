@@ -1,6 +1,8 @@
 
 import React from 'react';
 import type { MeetingDataHook } from '../types';
+// FIX: Import AttendanceStatus to resolve 'Cannot find name' error.
+import { AttendanceStatus } from '../types';
 import Card from '../components/Card';
 import { PlusIcon } from '../constants';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -11,7 +13,7 @@ interface FinanceScreenProps {
 }
 
 const FinanceScreen: React.FC<FinanceScreenProps> = ({ data }) => {
-  const { expenses, fineVote, members, addVote } = data;
+  const { expenses, fineVote, members, currentUser, addVote, settleCurrentPeriod } = data;
   
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
   const costPerMember = members.length > 0 ? totalExpenses / members.length : 0;
@@ -22,7 +24,7 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ data }) => {
     <div className="p-4 space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <Card className="text-center">
-          <p className="text-sm text-onSurfaceSecondary">N빵 총액</p>
+          <p className="text-sm text-onSurfaceSecondary">이번 주기 N빵 총액</p>
           <p className="text-2xl font-bold text-primary-dark">{totalExpenses.toLocaleString()}원</p>
         </Card>
         <Card className="text-center">
@@ -31,28 +33,32 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ data }) => {
         </Card>
       </div>
 
-      <Card title="공동 회비 사용 내역" action={
+      <Card title="이번 주기 공동 회비 사용 내역" action={
         <button className="bg-primary text-onPrimary p-2 rounded-full shadow-md hover:bg-primary-light">
           <PlusIcon className="w-5 h-5" />
         </button>
       }>
-        <ul className="space-y-3">
-          {expenses.map(exp => {
-            const payer = members.find(m => m.id === exp.paidByMemberId);
-            return (
-              <li key={exp.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="font-semibold">{exp.description}</p>
-                  <p className="text-sm text-onSurfaceSecondary">{exp.date} &bull; {payer?.name} 결제</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-lg">{exp.amount.toLocaleString()}원</p>
-                  {exp.receiptUrl && <a href={exp.receiptUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">영수증 보기</a>}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+        {expenses.length > 0 ? (
+            <ul className="space-y-3">
+            {expenses.map(exp => {
+                const payer = members.find(m => m.id === exp.paidByMemberId);
+                return (
+                <li key={exp.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <div>
+                    <p className="font-semibold">{exp.description}</p>
+                    <p className="text-sm text-onSurfaceSecondary">{exp.date} &bull; {payer?.name} 결제</p>
+                    </div>
+                    <div className="text-right">
+                    <p className="font-bold text-lg">{exp.amount.toLocaleString()}원</p>
+                    {exp.receiptUrl && <a href={exp.receiptUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">영수증 보기</a>}
+                    </div>
+                </li>
+                );
+            })}
+            </ul>
+        ) : (
+            <p className="text-center text-onSurfaceSecondary py-4">이번 주기에 등록된 지출 내역이 없습니다.</p>
+        )}
       </Card>
       
       <Card title={`💰 누적 벌금 사용 투표 (${fineVote.totalFines.toLocaleString()}원)`}>
@@ -82,11 +88,21 @@ const FinanceScreen: React.FC<FinanceScreenProps> = ({ data }) => {
         </div>
       </Card>
 
-       <Card title="최종 정산">
-        <p className="text-onSurfaceSecondary mb-4">모임 마지막 날, 멤버별 환급액 리포트를 생성할 수 있습니다.</p>
-        <button className="w-full bg-secondary text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-colors">
-          최종 정산 리포트 생성하기
-        </button>
+       <Card title="주기별 정산">
+        {currentUser.isLeader ? (
+            <>
+                <p className="text-onSurfaceSecondary mb-4">이번 주기를 마감하고, 멤버별 환급액 리포트를 생성하여 공지사항에 자동으로 게시합니다.</p>
+                <button 
+                    onClick={settleCurrentPeriod}
+                    className="w-full bg-secondary text-white font-bold py-3 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
+                    disabled={expenses.length === 0 && !data.sessions.some(s => s.attendance.some(a => a.status !== AttendanceStatus.Present && a.status !== AttendanceStatus.Pending))}
+                >
+                    이번 주기 정산 및 리포트 생성
+                </button>
+            </>
+        ) : (
+            <p className="text-onSurfaceSecondary text-center py-4">정산이 마감되면 모임장이 공지사항에 리포트를 공유합니다.</p>
+        )}
       </Card>
     </div>
   );

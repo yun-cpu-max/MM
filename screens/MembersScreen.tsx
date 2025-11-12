@@ -1,4 +1,5 @@
 
+
 import React, { useMemo } from 'react';
 import type { MeetingDataHook } from '../types';
 import Card from '../components/Card';
@@ -9,7 +10,7 @@ interface MembersScreenProps {
 }
 
 const MembersScreen: React.FC<MembersScreenProps> = ({ data }) => {
-  const { members, sessions, meeting } = data;
+  const { members, allSessions, meeting } = data;
 
   const memberStats = useMemo(() => {
     return members.map(member => {
@@ -18,7 +19,7 @@ const MembersScreen: React.FC<MembersScreenProps> = ({ data }) => {
       let absent = 0;
       let totalFines = 0;
       
-      sessions.forEach(session => {
+      allSessions.forEach(session => {
         const attendance = session.attendance.find(a => a.memberId === member.id);
         if (attendance) {
           switch (attendance.status) {
@@ -48,7 +49,7 @@ const MembersScreen: React.FC<MembersScreenProps> = ({ data }) => {
         absentCount: absent,
       };
     }).sort((a, b) => b.attendanceRate - a.attendanceRate || a.totalFines - b.totalFines);
-  }, [members, sessions, meeting.rules]);
+  }, [members, allSessions, meeting.rules]);
   
   const bestMember = memberStats[0];
   const lateKing = [...memberStats].sort((a,b) => b.lateCount - a.lateCount || b.totalFines - a.totalFines)[0];
@@ -89,12 +90,8 @@ const MembersScreen: React.FC<MembersScreenProps> = ({ data }) => {
               <div className="flex-grow">
                 <p className="font-semibold">{member.name}</p>
                 <p className="text-sm text-onSurfaceSecondary">
-                  출석률 {member.attendanceRate.toFixed(0)}%
+                  출석률 {member.attendanceRate.toFixed(1)}% &bull; 누적 벌금: {member.totalFines.toLocaleString()}원
                 </p>
-              </div>
-              <div className="text-right">
-                <p className="font-semibold text-red-500">{member.totalFines.toLocaleString()}원</p>
-                <p className="text-xs text-onSurfaceSecondary">지각 {member.lateCount} | 결석 {member.absentCount}</p>
               </div>
             </div>
           ))}

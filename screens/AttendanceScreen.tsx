@@ -79,7 +79,7 @@ const AttendanceHistory: React.FC<{ sessions: MeetingSession[]; members: Meeting
 }
 
 const AttendanceScreen: React.FC<AttendanceScreenProps> = ({ data }) => {
-  const { currentUser, members, sessions, updateAttendance } = data;
+  const { currentUser, members, sessions, allSessions, updateAttendance } = data;
   const todaySession = sessions.find(s => s.attendance.some(a => a.status === AttendanceStatus.Pending));
   
   return (
@@ -87,7 +87,7 @@ const AttendanceScreen: React.FC<AttendanceScreenProps> = ({ data }) => {
       {currentUser.isLeader && todaySession && (
         <AttendanceCheckCard session={todaySession} members={members} updateAttendance={updateAttendance} />
       )}
-      <AttendanceHistory sessions={sessions} members={members} />
+      <AttendanceHistory sessions={allSessions} members={members} />
     </div>
   );
 };
